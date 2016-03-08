@@ -1,0 +1,8 @@
+*.o
+*.bin
+*.out
+*.log
+cell_3d
+Makefile
+!c_REF.bin
+run_sim.sl
