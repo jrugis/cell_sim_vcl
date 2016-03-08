@@ -4,7 +4,7 @@
 3. build the simulation code
   1. cd cell_sim/src
   2. cp JWR_Makefile Makefile
-  3. edit Makefile to point to your petsc build
+  3. edit Makefile (if required) for your build
   4. load modules as shown in the makefile
   5. make
   6. cd ..
