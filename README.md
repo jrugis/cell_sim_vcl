@@ -1,6 +1,6 @@
 # cell_sim_vcl
 1. install dependencies: eigen, boost, viennacl
-2. git clone https://github.com/jrugis/cell_sim.git
+2. git clone https://github.com/jrugis/cell_sim_vcl.git
 3. build the simulation code
   1. cd cell_sim/src
   2. cp JWR_Makefile Makefile
