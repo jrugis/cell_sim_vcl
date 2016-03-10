@@ -23,7 +23,7 @@ public:
 	void step(MatrixX1C &solvec, MatrixX1C &rhsvec);
 
 private:
-	//Mat *A; // system matrix
+	MatrixXXC *A; // system matrix
 };
 
 #endif /* CVCLSOLVER_H_ */

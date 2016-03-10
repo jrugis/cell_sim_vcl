@@ -11,6 +11,7 @@
 #define MESH_FILE "cs.msh"
 #include <iostream>
 #include <ctime>
+#include <unistd.h>
 
 #include "cCellMesh.h"
 #include "cGeneric3dModel.h"
