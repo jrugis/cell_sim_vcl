@@ -277,7 +277,7 @@ void cGeneric3dModel::run(){
 	solvec.resize(VARIABLES * mesh->nodes_count, Eigen::NoChange);
 	rhsvec.resize(VARIABLES * mesh->nodes_count, Eigen::NoChange);
 	solvec = u.col(0);
-	for(long i = 1; i < 3; i++){
+	for(long i = 1; i < numt; i++){
 		std::cout << std::fixed << std::setprecision(8) << i * p[delt] << " " << Amat(1,1) << " ";
 		rhsvec = (mass * solvec) + (p[delt] * make_load(i - 1));
 		//*********************************************************

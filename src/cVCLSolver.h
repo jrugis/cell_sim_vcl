@@ -12,9 +12,11 @@ typedef double tCalcs;
 
 #include <string>
 #include <Eigen/Dense>
+#include "viennacl/compressed_matrix.hpp"
 
 typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, Eigen::Dynamic> MatrixXXC;
 typedef Eigen::Matrix<tCalcs, Eigen::Dynamic, 1> MatrixX1C;
+typedef viennacl::compressed_matrix<tCalcs> VCLSparseMat;
 
 class cVCLSolver {
 public:
