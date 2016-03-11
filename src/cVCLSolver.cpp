@@ -10,7 +10,6 @@
 
 // enable Eigen wrappers within ViennaCL
 #define VIENNACL_HAVE_EIGEN
-#include "viennacl/linalg/jacobi_precond.hpp"
 #include "viennacl/linalg/gmres.hpp"
 
 #include "cVCLSolver.h"
@@ -18,53 +17,56 @@
 
 cVCLSolver::cVCLSolver(MatrixXXC &Amat){
 	std::cout << "<SOLVER> initialising the solver..." << std::endl;
-	// initialise pointer to A
-    A = &Amat;
-	// etc
+    
+    // convert A matrix to sparse format
+    Eigen::SparseMatrix<tCalcs, Eigen::RowMajor> sparseA;
+    sparseA = Amat.sparseView();
+    
+    // copy A matrix into vcl matrix
+    viennacl::copy(sparseA, vcl_sparseA);
+    
+    // number of columns
+    size = Amat.cols();
+    
+    // read gmres parameters (remove after benchmarking)
+    std::ifstream gmres_file("bench_params.txt");
+    gmres_file >> gmres_maxiter >> gmres_tol >> gmres_restart;
+    int ilut_num;
+    double ilut_tol;
+    gmres_file >> ilut_num >> ilut_tol;
+    gmres_file.close();
+    std::cout << "<SOLVER> gmres params: " << gmres_maxiter << " " << gmres_tol <<  " " << gmres_restart << std::endl;
+    std::cout << "<SOLVER> ILUT params: " << ilut_num << " " << ilut_tol << std::endl;
+    
+    // preconditioner configuration
+    viennacl::linalg::ilut_tag precond_conf(ilut_num, ilut_tol);
+    
+    // precondition the matrix
+    vcl_precond = new vcl_precond_t(vcl_sparseA, precond_conf);
 }
 
 cVCLSolver::~cVCLSolver(){
 	// anything to destroy?
+    delete vcl_precond;
 }
 
 void cVCLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec){
-    // convert A matrix to sparse format
-    int nrows = (*A).rows();
-    int ncols = (*A).cols();
-    std::cout << "A size: " << (*A).rows() << " x " << (*A).cols();
-    Eigen::SparseMatrix<tCalcs, Eigen::RowMajor> sparseA;
-    sparseA = (*A).sparseView();
+    // cast to VectorXd for vcl copy
+    Eigen::VectorXd evec_rhs = static_cast<Eigen::VectorXd>(rhsvec);
+    Eigen::VectorXd evec_sol = static_cast<Eigen::VectorXd>(solvec);
     
-    // temporary; vcl copy doesn't like MatrixX1C
-    Eigen::VectorXd evec_rhs(ncols);
-    Eigen::VectorXd evec_sol(ncols);
-    for (int i = 0; i < ncols; i++){
-        evec_rhs(i) = rhsvec(i);
-    }
-    
-    std::cout << " " << (*A)(1,1) << " ";
-    
-    // convert to viennacl matrix/vector types
-    VCLSparseMat vcl_sparseA(nrows, ncols);
-    viennacl::vector<tCalcs> vcl_rhs(ncols);
-    viennacl::vector<tCalcs> vcl_sol(ncols);
-    
-    viennacl::copy(sparseA, vcl_sparseA);
+    // copy data to viennacl vector
+    viennacl::vector<tCalcs> vcl_sol;
+    viennacl::vector<tCalcs> vcl_rhs(size);
     viennacl::copy(rhsvec, vcl_rhs);
     
-    // set up preconditioner (Jacobi with default settings)
-    viennacl::linalg::jacobi_precond<VCLSparseMat> vcl_jacobi(vcl_sparseA, viennacl::linalg::jacobi_tag());
-    
     // solve
-    viennacl::linalg::gmres_tag my_gmres_tag(1e-8, 500, 80);
-    vcl_sol = viennacl::linalg::solve(vcl_sparseA, vcl_rhs, my_gmres_tag, vcl_jacobi);
+    viennacl::linalg::gmres_tag my_gmres_tag(gmres_tol, gmres_maxiter, gmres_restart);
+    vcl_sol = viennacl::linalg::solve(vcl_sparseA, vcl_rhs, my_gmres_tag, *vcl_precond);
     
-    // copy data back to Eigen matrix/vectors (is this only required for the solution?)
+    // copy/cast data back to Eigen vector
     viennacl::copy(vcl_sol, evec_sol);
-    // temporary; vcl copy doesn't like MatrixX1C
-    for (int i = 0; i < ncols; i++){
-        solvec(i) = evec_sol(i);
-    }
+    solvec = static_cast<MatrixX1C>(evec_sol);
     
-    std::cout << my_gmres_tag.iters() << " " << my_gmres_tag.error() << " " << solvec(1);
+    std::cout << my_gmres_tag.iters() << " " << my_gmres_tag.error() << std::endl;
 }

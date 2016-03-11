@@ -278,7 +278,7 @@ void cGeneric3dModel::run(){
 	rhsvec.resize(VARIABLES * mesh->nodes_count, Eigen::NoChange);
 	solvec = u.col(0);
 	for(long i = 1; i < numt; i++){
-		std::cout << std::fixed << std::setprecision(8) << i * p[delt] << " " << Amat(1,1) << " ";
+		std::cout << std::fixed << std::setprecision(8) << i * p[delt] << " ";
 		rhsvec = (mass * solvec) + (p[delt] * make_load(i - 1));
 		//*********************************************************
 		//solvec = Amat.llt().solve(rhsvec);
@@ -288,7 +288,6 @@ void cGeneric3dModel::run(){
 		solver->step(solvec, rhsvec);
 		//*********************************************************
 		u.col(i) = solvec;
-        std::cout << " " << solvec(1) << std::endl;
 	}
 	//save_matrix("mass_ei.bin", mass);
 	//save_matrix("rhsvec_ei.bin", rhsvec);
