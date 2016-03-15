@@ -6,6 +6,8 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include <Eigen/Sparse>
 
 // enable Eigen wrappers within ViennaCL
@@ -67,6 +69,15 @@ void cVCLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec){
     // copy/cast data back to Eigen vector
     viennacl::copy(vcl_sol, evec_sol);
     solvec = static_cast<MatrixX1C>(evec_sol);
+    
+    // DEBUGGING
+    std::ofstream fh("vcl_solvec.dat");
+    fh << std::fixed << std::setprecision(16);
+    for (int i = 0; i < size; i++){
+        fh << solvec(i) << std::endl;
+    }
+    fh.close();
+    // END DEBUGGING
     
     std::cout << my_gmres_tag.iters() << " " << my_gmres_tag.error() << std::endl;
 }
