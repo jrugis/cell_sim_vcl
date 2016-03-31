@@ -10,7 +10,6 @@
   6. cd ..
 4. run the simulation
   1. cp JWR_run_sim.sl run_sim.sl
-  2. edit run_sim.sl to point to your petsc build 
-  3. sbatch run_sim.sl
+  2. sbatch run_sim.sl
 5. check the results
   1. diff c.bin c_REF.bin
