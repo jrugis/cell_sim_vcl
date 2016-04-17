@@ -7,3 +7,4 @@ Makefile
 !c_REF.bin
 run_sim.sl
 .DS_Store
+*.pyc
