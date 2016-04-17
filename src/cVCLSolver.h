@@ -33,11 +33,6 @@ private:
     int size;
     // preconditioner for passing to gmres
     vcl_precond_t  *vcl_precond;
-    
-    // for benchmarking
-    double gmres_tol;
-    int gmres_maxiter;
-    int gmres_restart;
 };
 
 #endif /* CVCLSOLVER_H_ */

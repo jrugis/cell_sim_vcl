@@ -30,18 +30,8 @@ cVCLSolver::cVCLSolver(MatrixXXC &Amat){
     // number of columns
     size = Amat.cols();
     
-    // read gmres parameters (remove after benchmarking)
-    std::ifstream gmres_file("bench_params.txt");
-    gmres_file >> gmres_maxiter >> gmres_tol >> gmres_restart;
-    int ilut_num;
-    double ilut_tol;
-    gmres_file >> ilut_num >> ilut_tol;
-    gmres_file.close();
-    std::cout << "<SOLVER> gmres params: " << gmres_maxiter << " " << gmres_tol <<  " " << gmres_restart << std::endl;
-    std::cout << "<SOLVER> ILUT params: " << ilut_num << " " << ilut_tol << std::endl;
-    
     // preconditioner configuration
-    viennacl::linalg::ilut_tag precond_conf(ilut_num, ilut_tol);
+    viennacl::linalg::ilut_tag precond_conf(40, 1e-5);
     
     // precondition the matrix
     vcl_precond = new vcl_precond_t(vcl_sparseA, precond_conf);
@@ -63,7 +53,7 @@ void cVCLSolver::step(MatrixX1C &solvec, MatrixX1C &rhsvec){
     viennacl::copy(rhsvec, vcl_rhs);
     
     // solve
-    viennacl::linalg::gmres_tag my_gmres_tag(gmres_tol, gmres_maxiter, gmres_restart);
+    viennacl::linalg::gmres_tag my_gmres_tag(1e-8, 500, 20);
     vcl_sol = viennacl::linalg::solve(vcl_sparseA, vcl_rhs, my_gmres_tag, *vcl_precond);
     
     // copy/cast data back to Eigen vector
