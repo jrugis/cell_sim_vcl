@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1            # number of tasks
 #SBATCH --cpus-per-task=1     # number of threads
 ##SBATCH --nodes=1             # number nodes
-#SBATCH -C sb                 # sb=Sandybridge wm=Westmere
+#SBATCH -C avx                 # sb=Sandybridge wm=Westmere avx=Sandybridge or Ivybridge
 
 # output some information
 echo $HOSTNAME

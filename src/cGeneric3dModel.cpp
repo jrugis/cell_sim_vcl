@@ -247,9 +247,10 @@ void cGeneric3dModel::make_matrices(){
 		stiffp(vi(3), vi(2)) = stiffp(vi(2), vi(3));
 		small_mass(vi(3), vi(2)) = small_mass(vi(2), vi(3));
 	}
-	mass = mass.Identity(VARIABLES * np, VARIABLES * np); // the mass matrix
+	MatrixXXC mass = mass.Identity(VARIABLES * np, VARIABLES * np); // the mass matrix
 	mass.block(0, 0, np, np) = small_mass;
 	mass.block(np, np, np, np) = small_mass;
+	sparseMass = mass.sparseView(); // store sparse mass matrix
 
 	MatrixXXC stiff; // the stiffness matrix
 	stiff = stiff.Zero(VARIABLES * np, VARIABLES * np);
@@ -279,7 +280,7 @@ void cGeneric3dModel::run(){
 	solvec = u.col(0);
 	for(long i = 1; i < numt; i++){
 		std::cout << std::fixed << std::setprecision(8) << i * p[delt] << " ";
-		rhsvec = (mass * solvec) + (p[delt] * make_load(i - 1));
+		rhsvec = (sparseMass * solvec) + (p[delt] * make_load(i - 1));
 		//*********************************************************
 		//solvec = Amat.llt().solve(rhsvec);
 		//solvec = Amat.ldlt().solve(rhsvec);

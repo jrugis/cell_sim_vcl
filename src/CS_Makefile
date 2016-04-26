@@ -4,12 +4,13 @@
 EIGEN_INC = -I/share/easybuild/RHEL6.3/sandybridge/software/Eigen/3.2.4-ictce-5.4.0/include
 BOOST_INC = -I/share/easybuild/RHEL6.3/sandybridge/software/Boost/1.55.0-goolf-1.5.14-Python-2.7.8/include
 VCL_INC = -I/projects/nesi00119/code/CS_dev/viennacl/ViennaCL-1.7.1
+DEFS = -DNDEBUG #-DEIGEN_USE_MKL_ALL -DVIENNACL_WITH_OPENMP -openmp
 
 CPP = icpc
-CPP_FLAGS = -O3 -xSSE4.2 -axAVX $(EIGEN_INC) $(BOOST_INC) $(VCL_INC)
+CPP_FLAGS = -std=c++11 -g -O3 -xSSE4.2 -axAVX $(DEFS) $(EIGEN_INC) $(BOOST_INC) $(VCL_INC) -I/share/easybuild/RHEL6.3/sandybridge/software/imkl/11.2.1.133-iimpi-7.2.3-GCC-4.9.2/include
 
 LINK = $(CPP)
-LINK_FLAGS = 
+LINK_FLAGS = # -L/share/easybuild/RHEL6.3/sandybridge/software/imkl/11.2.1.133-iimpi-7.2.3-GCC-4.9.2/lib/intel64  -lmkl_rt -lpthread -lm -ldl #-openmp
 
 EXE = cell_3d
 OBJS = $(EXE).o cGeneric3dModel.o cCellMesh.o cVCLSolver.o
@@ -29,7 +30,7 @@ cVCLSolver.o: cVCLSolver.cpp cVCLSolver.h
 	$(CPP) $(CPP_FLAGS) -o $@ -c $<
 
 $(EXE): $(OBJS)
-	$(LINK) $(LINK_FLAGS) -o $@ $+
+	$(LINK) -o $@ $+ $(LINK_FLAGS)
 
 clean:
 	rm -f *.o $(EXE) 

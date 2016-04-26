@@ -9,6 +9,7 @@
 #define CGENERIC3DMODEL_H_
 
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 #include "cCellMesh.h"
 #include "cVCLSolver.h"
 
@@ -42,7 +43,8 @@ public:
 	void run();
 	void save_results();
 
-	MatrixXXC Amat, mass, u; // A, mass and solution matrices
+	MatrixXXC Amat, u; // A and solution matrices
+	Eigen::SparseMatrix<tCalcs, Eigen::RowMajor> sparseMass; // mass matrix
 
 private:
 	void get_parameters();
